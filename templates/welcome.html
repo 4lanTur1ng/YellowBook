@@ -20,33 +20,56 @@
         /* 修改按钮的样式 */
         #postsList .btn {
             margin-bottom: 10px;
+            width: 100%;
+        }
+        #postDetail {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        #createPostForm {
+            margin-top: 20px;
+        }
+        #postContent {
+            margin-bottom: 10px;
+        }
+        #postButton {
+            width: 100%;
+        }
+        /* 修改Welcome标题的字体为圆体 */
+        h1 {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
     <div id="sidebar">
-        <h1>Welcome, {{ username }}!</h1>
-        <a href="{{ url_for('hall') }}">Hall</a>
-        <button class="btn btn-primary" onclick="showCreatePostForm()">Create Post</button>
+        <h1 class="text-center">Welcome, {{ username }}!</h1>
+        <a href="{{ url_for('hall') }}" class="btn btn-primary btn-block mb-3">Hall</a>
+        <button class="btn btn-primary btn-block mb-3" onclick="showCreatePostForm()">Create Post</button>
         <h2>History Posts:</h2>
         <div id="postsList">
             {% for post in posts %}
-                <button class="btn btn-outline-primary" onclick="showPostContent('{{ post['p']['content'] }}')">{{ loop.index }}</button>
+                <button class="btn btn-outline-primary btn-block" onclick="showPostContent('{{ post['post']['content'] }}', '{{ post['comment_count'] }}', '{{ post['likes_count'] }}')">Post {{ loop.index }}</button>
             {% endfor %}
             {% if not posts %}
-                <p>No posts available.</p>
+                <p class="text-center">No posts available.</p>
             {% endif %}
         </div>
-        <a href="{{ url_for('user_details', username=username) }}">User Details</a>
+        <a href="{{ url_for('user_details', username=username) }}" class="btn btn-primary btn-block mt-3">User Details</a>
     </div>
     <div id="main">
         <div id="postDetail">
             <!-- post detail will be shown here -->
         </div>
         <form id="createPostForm" action="{{ url_for('create_post') }}" method="post" style="display: none;">
-            <textarea id="postContent" name="post_content" class="form-control" placeholder="Write a new post..."></textarea>
-            <button type="button" class="btn btn-primary" onclick="createPost()">Post</button>
+            <textarea id="postContent" name="post_content" class="form-control mb-3" placeholder="Write a new post..."></textarea>
+            <button type="button" id="postButton" class="btn btn-primary btn-block" onclick="createPost()">Post</button>
         </form>
     </div>
     <script>
@@ -55,10 +78,14 @@
             document.getElementById('postDetail').style.display = 'none';
         }
 
-        function showPostContent(content) {
+        function showPostContent(content, commentCount, likesCount) {
             document.getElementById('postDetail').style.display = 'block';
             document.getElementById('createPostForm').style.display = 'none';
-            document.getElementById('postDetail').textContent = content;
+            document.getElementById('postDetail').innerHTML = `
+                <p>${content}</p>
+                <p>Comment Count: ${commentCount}</p>
+                <p>Likes Count: ${likesCount}</p>
+            `;
         }
 
         function createPost() {
@@ -70,10 +97,10 @@
                 success: function(response) {
                     const newPostNumber = $('#postsList').children().length + 1;
                     const newPost = $('<button></button>')
-                        .text(newPostNumber)
-                        .addClass('btn btn-outline-primary')
+                        .text('Post ' + newPostNumber)
+                        .addClass('btn btn-outline-primary btn-block')
                         .click(function() {
-                            showPostContent(content);
+                            showPostContent(content, 0, 0);
                         });
                     $('#postsList').prepend(newPost);
                     document.getElementById('postContent').value = '';
