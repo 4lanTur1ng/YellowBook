@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>小黄书</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #000080; /* 设置背景色为深蓝色 */
+        }
+        .title {
+            color: #FFD700; /* 金黄色标题 */
+            margin-bottom: 40px;
+        }
+        .btn {
+            width: 200px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">小黄书</h1>
+    <a href="{{ url_for('create_new_user') }}" class="btn btn-primary">注册</a>
+    <a href="{{ url_for('sign_in') }}" class="btn btn-secondary">登录</a>
+</body>
+</html>
