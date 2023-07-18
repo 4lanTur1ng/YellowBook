@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Post Details</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h2, p {
+            margin-bottom: 10px;
+        }
+
+        #commentsList {
+            margin-top: 20px;
+        }
+
+        .comment {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if post %}
+            <h1>Post Details</h1>
+            <div>
+                <h2>Post: {{ post['content'] }}</h2>
+                <p>User ID: {{ post['user_id'] }}</p>
+                <p>Likes: {{ likes_count }}</p>
+                <p>Posted at: {{ post['timestamp'] }}</p>
+                <form method="POST" action="{{ url_for('create_like') }}">
+                    <input type="hidden" name="post_id" value="{{ post['id'] }}">
+                    <button type="submit" class="btn btn-primary">Like Post</button>
+                </form>
+            </div>
+            <h2>Comments:</h2>
+            <div id="commentsList">
+                {% if comments %}
+                    {% for comment in comments %}
+                        <div class="comment">
+                            <p>{{ comment['comment']['content'] }}</p>
+                            <p>User Name: {{ comment['user']['name'] }}</p>
+                            <p>Likes: {{ comment['likes'] }}</p>
+                            <p>Posted at: {{ comment['comment']['timestamp'] }}</p>
+                            <form method="POST" action="{{ url_for('create_like') }}">
+                                <input type="hidden" name="comment_id" value="{{ comment['comment']['id'] }}">
+                                <button type="submit" class="btn btn-primary">Like</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No comments available.</p>
+                {% endif %}
+            </div>
+            <form method="POST" action="{{ url_for('post_details', post_id=post['id']) }}">
+                <div class="form-group">
+                    <textarea class="form-control" name="comment_content" placeholder="Write a comment..." rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form>
+        {% else %}
+            <p>Post not found.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
