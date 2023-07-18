@@ -47,9 +47,26 @@ def create_new_user():
 
 @app.route('/welcome/<username>')
 def welcome_user(username):
-    # 只返回当前用户创建的帖子
-    posts = graph.run("MATCH (u:User {name: $username})-[:POSTED]->(p:Post) RETURN p", username=username).data()
+    # 查询当前用户创建的帖子及其评论和点赞数
+    query = """
+        MATCH (u:User {name: $username})-[:POSTED]->(p:Post)
+        OPTIONAL MATCH (p)<-[:COMMENTED]-(c:Comment)
+        OPTIONAL MATCH (p)<-[:LIKED_POST]-(liker:User)
+        RETURN p, COUNT(DISTINCT c) AS comment_count, COUNT(DISTINCT liker) AS likes_count
+        ORDER BY p.timestamp DESC
+    """
+    posts_result = graph.run(query, username=username).data()
+    posts = [
+        {
+            'post': post['p'],
+            'comment_count': post['comment_count'],
+            'likes_count': post['likes_count']
+        }
+        for post in posts_result
+    ]
+
     return render_template('welcome.html', username=username, posts=posts)
+
 
 
 @app.route('/user/<username>')
