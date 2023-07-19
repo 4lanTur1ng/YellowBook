@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: row;
+        }
+         #container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: row;
+            background-color: #000000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #sidebar {
+            flex: 1;
+            border-right: 1px solid #ccc;
+            padding: 10px;
+        }
+        #main {
+            flex: 3;
+            padding: 10px;
+        }
+        /* 修改按钮的样式 */
+        #postsList .btn {
+            margin-bottom: 10px;
+            width: 100%;
+        }
+         .nav-btns {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+         .nav-btn {
+             padding: 10px 20px;
+            font-size: 16px;
+            background-color: 	#007bff;
+            color: #fff;
+            border:none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        #postDetail {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        #createPostForm {
+            margin-top: 20px;
+        }
+        #postContent {
+            margin-bottom: 10px;
+        }
+        #postButton {
+            width: 100%;
+        }
+        /* 修改Welcome标题的字体为圆体 */
+        h1 {
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="sidebar">
+        <h1 class="text-center">Welcome, {{ username }}!</h1>
+        <a href="{{ url_for('hall') }}" class="btn btn-primary btn-block mb-3">Hall</a>
+        <button class="btn btn-primary btn-block mb-3" onclick="showCreatePostForm()">Create Post</button>
+        <h2>History Posts:</h2>
+        <div id="postsList">
+            {% for post in posts %}
+                <button class="btn btn-outline-primary btn-block" onclick="showPostContent('{{ post['post']['content'] }}', '{{ post['comment_count'] }}', '{{ post['likes_count'] }}')">Post {{ loop.index }}</button>
+            {% endfor %}
+            {% if not posts %}
+                <p class="text-center">No posts available.</p>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('user_details', username=username) }}" class="btn btn-primary btn-block mt-3">User Details</a>
+    </div>
+    <div id="main">
+         <div class="nav-btns" style="background-color: white;border: 2px solid white; border-radius: 0px;">
+                <button class="nav-btn" onclick="jumpToCategory(1)">分区1</button>
+                <button class="nav-btn" onclick="jumpToCategory(2)">分区2</button>
+                <button class="nav-btn" onclick="jumpToCategory(3)">分区3</button>
+                <button class="nav-btn" onclick="jumpToCategory(4)">分区4</button>
+                <button class="nav-btn" onclick="jumpToCategory(5)">分区5</button>
+            </div>
+        <div id="postDetail">
+            <!-- post detail will be shown here -->
+        </div>
+        <form id="createPostForm" action="{{ url_for('create_post') }}" method="post" style="display: none;">
+            <textarea id="postContent" name="post_content" class="form-control mb-3" placeholder="Write a new post..."></textarea>
+            <button type="button" id="postButton" class="btn btn-primary btn-block" onclick="createPost()">Post</button>
+        </form>
+
+        <h1>Hall</h1>
+        <h2>Posts:</h2>
+        <div id="postsList">
+            {% for post in posts111 %}
+            <div>
+                <p style="color: black;">{{ post['user_id'] }}: {{ post['content'] }}</p>
+                 <!-- 添加帖子创建时间 -->
+
+                <a href="{{ url_for('post_details', post_id=post['id']) }}">View Details</a>
+            </div>
+                {% endfor %}
+        </div>
+    </div>
+    <script>
+        function showCreatePostForm() {
+            document.getElementById('createPostForm').style.display = 'block';
+            document.getElementById('postDetail').style.display = 'none';
+        }
+
+      function showPostContent(content, commentCount, likesCount,postID) {
+    document.getElementById('postDetail').style.display = 'block';
+    document.getElementById('createPostForm').style.display = 'none';
+
+    // 创建按钮元素
+    const deleteButton = document.createElement('button');
+    deleteButton.innerText = '删除本帖子';
+    deleteButton.className = 'btn btn-danger';
+    deleteButton.addEventListener('click', function () {
+       $.ajax({
+            url: '/delete_post', // 根据您的后端路由设置正确的 URL
+            type: 'POST',
+            data: { 'post_id': postID },
+            success: function(response) {
+                // 成功删除帖子后，您可以处理服务器的响应
+                alert('帖子已删除'); // 仅作为演示，您可以根据服务器端的响应进行适当处理
+                // 可选：在删除成功后，可以重新加载页面或从列表中移除被删除的帖子
+                // 重新加载页面的示例：
+                location.reload();
+            },
+            error: function(error) {
+                // 处理删除帖子时出错的情况
+                alert('删除帖子时出错，请重试'); // 仅作为演示，您可以根据实际错误进行适当处理
+            }
+        });
+
+
+        // 删除帖子后，隐藏帖子详情部分
+        document.getElementById('postDetail').style.display = 'none';
+    });
+
+    // 获取帖子详情容器
+    const postDetailContainer = document.getElementById('postDetail');
+
+    // 在帖子详情容器中添加帖子内容
+    postDetailContainer.innerHTML = `
+        <p>${content}</p>
+        <p>Comment Count: ${commentCount}</p>
+        <p>Likes Count: ${likesCount}</p>`;
+
+    // 将按钮添加到帖子详情容器
+    postDetailContainer.appendChild(deleteButton);
+}
+
+       function createPost() {
+    const content = $('#postContent').val();
+
+    // 获取当前系统时间
+    // const currentDate = new Date();
+    // const currentYear = currentDate.getFullYear();
+    // const currentMonth = currentDate.getMonth() + 1; // 月份从 0 开始计数，所以需要加
+    //        const currentDay = currentDate.getDate();
+    // const currentHour = currentDate.getHours();
+    // const currentMinute = currentDate.getMinutes();
+    // const currentTimeString = `${ currentYear}年${ currentMonth}月${ currentDay}日${currentHour}:${currentMinute}`;
+
+    $.ajax({
+        url: '{{ url_for("create_post") }}',
+        type: 'POST',
+        data: { 'post_content': content },
+        success: function(response) {
+            const newPostNumber = $('#postsList').children().length + 1;
+            const newPost = $('<button></button>')
+                .text('Post ' + newPostNumber ) // 将时间信息添加到新帖子按钮的文本中
+                .addClass('btn btn-outline-primary btn-block')
+                .click(function() {
+                    showPostContent(content, 0,0 ,newPostNumber);
+                });
+            $('#postsList').prepend(newPost);
+            document.getElementById('postContent').value = '';
+            document.getElementById('createPostForm').style.display = 'none';
+        }
+    });
+}
+
+    </script>
+</body>
+</html>
