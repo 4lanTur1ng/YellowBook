@@ -8,14 +8,6 @@
             display: flex;
             flex-direction: row;
         }
-         #container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: row;
-            background-color: #000000;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
         #sidebar {
             flex: 1;
             border-right: 1px solid #ccc;
@@ -29,20 +21,6 @@
         #postsList .btn {
             margin-bottom: 10px;
             width: 100%;
-        }
-         .nav-btns {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-         .nav-btn {
-             padding: 10px 20px;
-            font-size: 16px;
-            background-color: 	#007bff;
-            color: #fff;
-            border:none;
-            border-radius: 10px;
-            cursor: pointer;
         }
         #postDetail {
             background-color: #f8f9fa;
@@ -66,6 +44,23 @@
             font-family: Arial, sans-serif;
             font-weight: bold;
         }
+        .post-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .delete-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            margin-left: 10px;
+            padding: 0;
+        }
+        .delete-icon {
+            width: 20px;
+            height: 20px;
+            fill: red;
+        }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
@@ -77,7 +72,10 @@
         <h2>History Posts:</h2>
         <div id="postsList">
             {% for post in posts %}
-                <button class="btn btn-outline-primary btn-block" onclick="showPostContent('{{ post['post']['content'] }}', '{{ post['comment_count'] }}', '{{ post['likes_count'] }}')">Post {{ loop.index }}</button>
+                <div class="post-container">
+                    <button class="btn btn-outline-primary btn-block" onclick="showPostContent('{{ post['post']['content'] }}', '{{ post['comment_count'] }}', '{{ post['likes_count'] }}')">Post {{ loop.index }}</button>
+                    <button class="delete-btn" onclick="confirmDelete('{{ post['post']['id'] }}')"><svg class="delete-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 6h-4L14 4H10l-2 2H4v2h16zm-3.4 6c.2-.5.4-1 .4-1.6 0-2.8-2.2-5-5-5s-5 2.2-5 5c0 .6.1 1.1.4 1.6l-.4 6h14.8l-.4-6zm-6.6 2v-2h-2v2H7v-2H5v2H3v2h18v-2h-2v-2h-2zM6 8h12v2H6zm0 4h3v2H6zm5 0h3v2h-3zm5 0h3v2h-3z"/></svg></button>
+                </div>
             {% endfor %}
             {% if not posts %}
                 <p class="text-center">No posts available.</p>
@@ -86,33 +84,13 @@
         <a href="{{ url_for('user_details', username=username) }}" class="btn btn-primary btn-block mt-3">User Details</a>
     </div>
     <div id="main">
-         <div class="nav-btns" style="background-color: white;border: 2px solid white; border-radius: 0px;">
-                <button class="nav-btn" onclick="jumpToCategory(1)">分区1</button>
-                <button class="nav-btn" onclick="jumpToCategory(2)">分区2</button>
-                <button class="nav-btn" onclick="jumpToCategory(3)">分区3</button>
-                <button class="nav-btn" onclick="jumpToCategory(4)">分区4</button>
-                <button class="nav-btn" onclick="jumpToCategory(5)">分区5</button>
-            </div>
         <div id="postDetail">
             <!-- post detail will be shown here -->
         </div>
         <form id="createPostForm" action="{{ url_for('create_post') }}" method="post" style="display: none;">
             <textarea id="postContent" name="post_content" class="form-control mb-3" placeholder="Write a new post..."></textarea>
-            <button type="button" id="postButton" class="btn btn-primary btn-block" onclick="createPost()">Post</button>
+            <button type="submit" id="postButton" class="btn btn-primary btn-block">Post</button>
         </form>
-
-        <h1>Hall</h1>
-        <h2>Posts:</h2>
-        <div id="postsList">
-            {% for post in posts111 %}
-            <div>
-                <p style="color: black;">{{ post['user_id'] }}: {{ post['content'] }}</p>
-                 <!-- 添加帖子创建时间 -->
-
-                <a href="{{ url_for('post_details', post_id=post['id']) }}">View Details</a>
-            </div>
-                {% endfor %}
-        </div>
     </div>
     <script>
         function showCreatePostForm() {
@@ -120,81 +98,38 @@
             document.getElementById('postDetail').style.display = 'none';
         }
 
-      function showPostContent(content, commentCount, likesCount,postID) {
-    document.getElementById('postDetail').style.display = 'block';
-    document.getElementById('createPostForm').style.display = 'none';
-
-    // 创建按钮元素
-    const deleteButton = document.createElement('button');
-    deleteButton.innerText = '删除本帖子';
-    deleteButton.className = 'btn btn-danger';
-    deleteButton.addEventListener('click', function () {
-       $.ajax({
-            url: '/delete_post', // 根据您的后端路由设置正确的 URL
-            type: 'POST',
-            data: { 'post_id': postID },
-            success: function(response) {
-                // 成功删除帖子后，您可以处理服务器的响应
-                alert('帖子已删除'); // 仅作为演示，您可以根据服务器端的响应进行适当处理
-                // 可选：在删除成功后，可以重新加载页面或从列表中移除被删除的帖子
-                // 重新加载页面的示例：
-                location.reload();
-            },
-            error: function(error) {
-                // 处理删除帖子时出错的情况
-                alert('删除帖子时出错，请重试'); // 仅作为演示，您可以根据实际错误进行适当处理
-            }
-        });
-
-
-        // 删除帖子后，隐藏帖子详情部分
-        document.getElementById('postDetail').style.display = 'none';
-    });
-
-    // 获取帖子详情容器
-    const postDetailContainer = document.getElementById('postDetail');
-
-    // 在帖子详情容器中添加帖子内容
-    postDetailContainer.innerHTML = `
-        <p>${content}</p>
-        <p>Comment Count: ${commentCount}</p>
-        <p>Likes Count: ${likesCount}</p>`;
-
-    // 将按钮添加到帖子详情容器
-    postDetailContainer.appendChild(deleteButton);
-}
-
-       function createPost() {
-    const content = $('#postContent').val();
-
-    // 获取当前系统时间
-    // const currentDate = new Date();
-    // const currentYear = currentDate.getFullYear();
-    // const currentMonth = currentDate.getMonth() + 1; // 月份从 0 开始计数，所以需要加
-    //        const currentDay = currentDate.getDate();
-    // const currentHour = currentDate.getHours();
-    // const currentMinute = currentDate.getMinutes();
-    // const currentTimeString = `${ currentYear}年${ currentMonth}月${ currentDay}日${currentHour}:${currentMinute}`;
-
-    $.ajax({
-        url: '{{ url_for("create_post") }}',
-        type: 'POST',
-        data: { 'post_content': content },
-        success: function(response) {
-            const newPostNumber = $('#postsList').children().length + 1;
-            const newPost = $('<button></button>')
-                .text('Post ' + newPostNumber ) // 将时间信息添加到新帖子按钮的文本中
-                .addClass('btn btn-outline-primary btn-block')
-                .click(function() {
-                    showPostContent(content, 0,0 ,newPostNumber);
-                });
-            $('#postsList').prepend(newPost);
-            document.getElementById('postContent').value = '';
+        function showPostContent(content, commentCount, likesCount) {
+            document.getElementById('postDetail').style.display = 'block';
             document.getElementById('createPostForm').style.display = 'none';
+            document.getElementById('postDetail').innerHTML = `
+                <p>${content}</p>
+                <p>Comment Count: ${commentCount}</p>
+                <p>Likes Count: ${likesCount}</p>
+            `;
         }
-    });
-}
 
+        function confirmDelete(postId) {
+            if (confirm("Are you sure you want to delete this post?")) {
+                deletePost(postId);
+            }
+        }
+
+        function deletePost(postId) {
+            $.ajax({
+                url: '/delete_post',
+                type: 'POST',
+                data: {
+                    post_id: postId
+                },
+                success: function(response) {
+                    alert(response.message);
+                    location.reload();  // 刷新页面
+                },
+                error: function(xhr, status, error) {
+                    alert('An error occurred while deleting the post.');
+                }
+            });
+        }
     </script>
 </body>
 </html>

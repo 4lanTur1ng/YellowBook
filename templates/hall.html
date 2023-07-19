@@ -16,29 +16,55 @@
             max-width: 1600px;
             margin-top: 20px;
         }
-        #postsList div {
+        .partition {
+            margin-top: 20px;
+        }
+        .post {
             background-color: #f8f9fa;
             border: 1px solid #ddd;
             border-radius: 5px;
             padding: 10px;
             margin-bottom: 10px;
+            text-align: left;
         }
-        #postsList a {
+        .post p {
+            margin-bottom: 5px;
+        }
+        .post a {
             color: #007bff;
             text-decoration: none;
+        }
+        #backButton {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <h1>Hall</h1>
     <h2>Posts:</h2>
-    <div id="postsList">
-        {% for post in posts %}
-            <div>
-                <p>{{ post['user_id'] }}: {{ post['content'] }}</p>
-                <a href="{{ url_for('post_details', post_id=post['id']) }}">View Details</a>
+    {% for partition, posts in grouped_posts.items() %}
+        <div class="partition">
+            <h3>{{ partition }}</h3>
+            <div id="postsList">
+                {% for post in posts %}
+                    <div class="post">
+                        <p><strong>{{ post['username'] }}</strong></p>
+                        <p>{{ post['post']['content'] }}</p>
+                        <a href="{{ url_for('post_details', post_id=post['post']['id']) }}">View Details</a>
+                    </div>
+                {% endfor %}
+                {% if not posts %}
+                    <p class="text-center">No posts available.</p>
+                {% endif %}
             </div>
-        {% endfor %}
-    </div>
+        </div>
+    {% endfor %}
+
+    <button id="backButton" class="btn btn-primary" onclick="goBack()">Back</button>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 </body>
 </html>
