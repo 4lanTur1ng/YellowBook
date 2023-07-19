@@ -4,9 +4,7 @@ from py2neo import Graph, Node, Relationship
 from neo import create_user, get_user_id, create_post, check_password, update_password, create_comment, create_like
 from extfunc import generate_unique_comment_id, get_post_details
 import datetime
-import random
-import torch
-import torch.nn.functional as F
+import nlp
 
 graph = Graph("bolt://localhost:7687", user="neo4j", password="12345678")
 
@@ -14,7 +12,7 @@ app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
 # 加载模型
-model = torch.jit.load('model.th')
+# model = torch.jit.load('model.th')
 
 @app.route('/create_user', methods=['GET', 'POST'])
 def create_new_user():
@@ -201,7 +199,7 @@ def user_details(username):
 
 
 # 定义可选的分区列表
-PARTITIONS = ['game', 'technology', 'sports', 'music', 'movies', 'books']
+label = ['DS', 'SEKIRO', 'genshin-impact', 'MGS', 'MH', 'star-rail']    # 游戏标签
 
 
 @app.route('/hall')
@@ -215,7 +213,7 @@ def hall():
     result = graph.run(query).data()
 
     # 创建字典以存储按分区分组的帖子列表
-    grouped_posts = {partition: [] for partition in PARTITIONS}
+    grouped_posts = {partition: [] for partition in label}
 
     # 将帖子记录分组存储到对应的分区列表中
     for record in result:
@@ -230,9 +228,10 @@ def hall():
 
 @app.route('/create_post', methods=['POST'])
 def create_post():
+
     post_content = request.form.get('post_content')  # 获取表单中的帖子内容
     user_id = session.get('user_id')  # 从session中获取当前登录的用户id
-    partition = random.choice(PARTITIONS) # to do nlp获取表单中的帖子分区
+    partition = label[int(nlp.predict(post_content))] # to do nlp获取表单中的帖子分区
 
     # 查询当前所有帖子中的最大id
     query = "MATCH (p:Post) RETURN max(p.id) AS max_id"
