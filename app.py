@@ -1,16 +1,20 @@
 import neo
-from flask import Flask, render_template, request, redirect, url_for, session,jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from py2neo import Graph, Node, Relationship
 from neo import create_user, get_user_id, create_post, check_password, update_password, create_comment, create_like
 from extfunc import generate_unique_comment_id, get_post_details
 import datetime
+import random
+import torch
+import torch.nn.functional as F
 
-
-graph = Graph("bolt://localhost:7687", user="neo4j", password="xuan1109lxy.")
+graph = Graph("bolt://localhost:7687", user="neo4j", password="12345678")
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
+# 加载模型
+model = torch.jit.load('model.th')
 
 @app.route('/create_user', methods=['GET', 'POST'])
 def create_new_user():
@@ -66,12 +70,7 @@ def welcome_user(username):
         for post in posts_result
     ]
 
-    query = "MATCH (u:User)-[:POSTED]->(p:Post) WHERE NOT u.banned RETURN p"
-    result = graph.run(query).data()
-    posts111 = [record['p'] for record in result]
-
-
-    return render_template('welcome.html', username=username, posts=posts,posts111=posts111)
+    return render_template('welcome.html', username=username, posts=posts)
 
 
 
@@ -187,35 +186,67 @@ def user_details(username):
     return render_template('user_details.html', username=username, user=user_node)
 
 
+# @app.route('/hall')
+# # def hall():
+# #     # 查询未封禁用户所发的帖子及其用户名
+# #     query = """
+# #         MATCH (u:User)-[:POSTED]->(p:Post)
+# #         WHERE NOT u.banned
+# #         RETURN p, u.name AS username
+# #     """
+# #     result = graph.run(query).data()
+# #     posts = [{'post': record['p'], 'username': record['username']} for record in result]
+# #     print(posts)
+# #     return render_template('hall.html', posts=posts)
+
+
+# 定义可选的分区列表
+PARTITIONS = ['game', 'technology', 'sports', 'music', 'movies', 'books']
+
+
 @app.route('/hall')
 def hall():
-    # 查询未封禁用户所发的帖子
-    query = "MATCH (u:User)-[:POSTED]->(p:Post) WHERE NOT u.banned RETURN p"
+    # 查询未封禁用户所发的帖子及其用户名，并按分区进行分组
+    query = """
+        MATCH (u:User)-[:POSTED]->(p:Post)
+        WHERE NOT u.banned
+        RETURN p, u.name AS username, p.partition AS partition
+    """
     result = graph.run(query).data()
-    posts = [record['p'] for record in result]
-    return render_template('hall.html', posts=posts)
+
+    # 创建字典以存储按分区分组的帖子列表
+    grouped_posts = {partition: [] for partition in PARTITIONS}
+
+    # 将帖子记录分组存储到对应的分区列表中
+    for record in result:
+        post = {'post': record['p'], 'username': record['username']}
+        partition = record['partition']
+        grouped_posts[partition].append(post)
+
+    return render_template('hall.html', grouped_posts=grouped_posts)
+
+
 
 
 @app.route('/create_post', methods=['POST'])
 def create_post():
-    post_content = request.form.get('post_content')
-    user_id = session.get('user_id')
+    post_content = request.form.get('post_content')  # 获取表单中的帖子内容
+    user_id = session.get('user_id')  # 从session中获取当前登录的用户id
+    partition = random.choice(PARTITIONS) # to do nlp获取表单中的帖子分区
 
+    # 查询当前所有帖子中的最大id
     query = "MATCH (p:Post) RETURN max(p.id) AS max_id"
     result = graph.run(query).data()
     max_id = result[0]['max_id'] if result and result[0]['max_id'] is not None else 0
 
+    # 创建新帖子的id为最大id + 1
     post_id = max_id + 1
+    # 获取当前时间作为发表时间
     timestamp = datetime.datetime.now()
+    # 调用创建新帖子的函数
+    neo.create_post(post_id, post_content, user_id, partition, timestamp=timestamp)
 
-    # 将timestamp转换为人类可读的时间格式，例如：2023年7月19日 14:30
-    created_time = timestamp.strftime("%Y年%m月%d日 %H:%M")
-    # 创建新帖子的函数中传入创建时间
-    neo.create_post(post_id, post_content, user_id, timestamp=created_time)
-
-
-
-    return redirect(url_for('welcome_user', username=session['username'], created_time=created_time))
+    return redirect(url_for('welcome_user', username=session['username']))  # 重定向回欢迎页面    return redirect(url_for('welcome_user', username=session['username']))  # 重定向回欢迎页面
 
 
 @app.route('/post_details/<post_id>', methods=['GET', 'POST'])
@@ -293,23 +324,22 @@ def create_like():
 def delete_post():
     post_id = request.form.get('post_id')
 
-
     if post_id is not None and post_id.isdigit():
         # 在 Neo4j 数据库中查找帖子节点
         query = "MATCH (p:Post) WHERE p.id = $post_id RETURN p"
         result = graph.run(query, post_id=int(post_id)).data()
-
 
         if result:
             post_node = result[0]['p']
             # 删除帖子节点及其关系
             graph.delete(post_node)
 
-            return jsonify({'message': '帖子删除成功'})
+            return jsonify({'message': 'Post deleted successfully'})
         else:
-            return jsonify({'message': '帖子不存在或已经被删除'})
+            return jsonify({'message': 'Post does not exist or has already been deleted'})
     else:
-        return jsonify({'message': '无效的帖子 ID'})
+        return jsonify({'message': 'Invalid post ID'})
+
 if __name__ == '__main__':
     app.run(debug=True)
 

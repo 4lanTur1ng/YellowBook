@@ -23,15 +23,19 @@ def get_user_id(username):
 
 
 # 创建帖子节点，添加时间属性和abandoned属性，包含分区属性为枚举类型，同时检查用户是否被封禁
-def create_post(post_id, content, user_id, timestamp=None, abandoned=False, tag=None):
+def create_post(post_id, content, user_id, partition, timestamp=None, abandoned=False):
     user_node = graph.nodes.match("User", id=user_id).first()
     # 检查用户是否被封禁
     if user_node["banned"]:
         print("This user is banned and cannot post.")
         return
-    post_node = Node("Post", id=post_id, content=content, user_id=user_id, abandoned=abandoned, tag=tag, timestamp=timestamp)
-    posted_rel = Relationship(user_node, "POSTED", post_node)
-    graph.create(posted_rel)
+    cypher = '''
+    MATCH (u:User)
+    WHERE u.id = $user_id
+    CREATE (p:Post {id: $post_id, content: $content, user_id: $user_id, partition: $partition, abandoned: $abandoned, timestamp: $timestamp})
+    CREATE (u)-[:POSTED]->(p)
+    '''
+    graph.run(cypher, user_id=user_id, post_id=post_id, content=content, partition=partition, abandoned=abandoned, timestamp=timestamp)
 
 
 # 创建评论节点，增加时间属性和abandoned属性，同时检查用户是否被封禁
