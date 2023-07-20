@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>GameHub</title>
+    <title>Gamehub</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -13,19 +13,35 @@
             background-color: #000000; /* Set the background color to black */
         }
         .title {
-            color: orange; /* Set the text color to yellow (gold) */
             margin-bottom: 40px;
         }
+        .gamehub-logo {
+            width: 400px; /* Set the width of the logo */
+            height: auto; /* Keep the aspect ratio of the image */
+        }
         .btn {
-            width: 200px;
+            width: 300px;
             margin-top: 10px;
-            background-color: orange; /* Set the button background color to yellow (gold) */
-            color: #000000; /* Set the button text color to black */
+        }
+        .btn-primary {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: darkorange;
+        color: white;
+
+        border:none;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-left: 10px;
+        margin-right: 10px;
+        border: 2px solid darkorange;
         }
     </style>
 </head>
 <body>
-    <h1 class="title">GameHub</h1>
+    <div class="title">
+        <img src="static\logo.png" alt="Gamehub Logo" class="gamehub-logo">
+    </div>
     <a href="{{ url_for('create_new_user') }}" class="btn btn-primary">Sign up</a>
     <a href="{{ url_for('sign_in') }}" class="btn btn-secondary">Log in</a>
 </body>

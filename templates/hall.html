@@ -67,14 +67,14 @@
             cursor: pointer;
              margin-left: 10px;
              margin-right: 10px;
-             border: 2px solid orange;
+             border: 2px solid darkorange;
         }
         .partition {
             margin-top: 0px;
         }
         .post {
             background-color: rgb(40,40,40);
-            border: 1px solid orange;
+            border: 1px solid darkorange;
             border-radius: 5px;
             padding:10px;
             margin-bottom: 10px;
@@ -86,18 +86,30 @@
             margin-bottom: 5px;
         }
         .post a {
-            color: orange;
+            color: dark;
             text-decoration: none;
         }
         #backButton {
             margin-top: 20px;
         }
+        .back-button {
+            position: fixed;
+            top: 10px; /* Adjust the top position as needed */
+            left: 10px; /* Adjust the left position as needed */
+            width: 200px;
+            height: 50px;
+            background-image: url('/static/logo.png');
+            background-size: cover;
+            border: none;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
     <h1 style="color:white">Hall</h1>
     <h2 style="color:white">Posts:</h2>
-    <div class="nav-btns" style="background-color: black;border: 2px solid orange; border-radius: 0px;">
+    <div class="nav-btns" style="background-color: black;border: 2px solid darkorange; border-radius: 0px;">
         <button class="nav-btn" data-category="all">全部</button>
         <button class="nav-btn" data-category="DS">{{label[0]}}</button>
         <button class="nav-btn" data-category="SEKIRO">{{label[1]}}</button>
@@ -118,8 +130,8 @@
                     <div class="post" data-category="{{ post['post']['partition'] }}">
                         <p class="humorous-font"><strong>{{ post['username'] }}</strong></p>
                         <p style="color:white">{{ post['post']['content'] }}</p>
-                        <p style="color:white;font-weight: bold; border: 1px solid orange; padding: 1px;">分区:{{post['post']['partition']}}</p>
-                        <a href="{{ url_for('post_details', post_id=post['post']['id']) }}">View Details</a>
+                        <p style="color:white;font-weight: bold; border: 1px solid darkorange; padding: 1px;">分区:{{post['post']['partition']}}</p>
+                        <a href="{{ url_for('post_details', post_id=post['post']['id']) }}" style="color: darkorange">View Details</a>
                     </div>
                 {% endfor %}
                 {% if not posts %}
@@ -128,7 +140,7 @@
         </div>
     {% endfor %}
 
-    <button id="backButton" class="nav-btn" onclick="goBack()">返回</button>
+    <button id="backButton" class="back-button" onclick="goBack()"></button>
 
     <script>
         function goBack() {
