@@ -221,7 +221,7 @@ def hall():
         partition = record['partition']
         grouped_posts[partition].append(post)
 
-    return render_template('hall.html', grouped_posts=grouped_posts)
+    return render_template('hall.html', grouped_posts=grouped_posts, label=label)
 
 
 
@@ -338,6 +338,14 @@ def delete_post():
             return jsonify({'message': 'Post does not exist or has already been deleted'})
     else:
         return jsonify({'message': 'Invalid post ID'})
+
+
+@app.route('/logout')
+def logout():
+    # 清除会话中的用户信息
+    session.pop('username', None)
+    return redirect(url_for('sign_in'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
