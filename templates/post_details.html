@@ -4,6 +4,12 @@
     <title>Post Details</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <style>
+        body {
+            background-color: #000000; /* Set the background color to black */
+            color: #FFD700; /* Set the text color to yellow (gold) */
+            position: relative; /* Set the body position to relative */
+        }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -19,9 +25,27 @@
         }
 
         .comment {
-            border: 1px solid #ccc;
+            border: 1px solid #FFD700; /* Set the comment border color to yellow (gold) */
             padding: 10px;
             margin-bottom: 10px;
+        }
+
+        /* Modify buttons' styles */
+        .btn, .btn-primary {
+            background-color: #FFD700; /* Set the button background color to yellow (gold) */
+            color: #000000; /* Set the button text color to black */
+        }
+
+        /* Position the Back button in the top-left corner */
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        /* Style the arrow symbol */
+        .arrow-symbol {
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -68,5 +92,13 @@
             <p>Post not found.</p>
         {% endif %}
     </div>
+    <button id="backButton" class="btn btn-primary" onclick="goToHall()">
+        <span class="arrow-symbol">&#8678;</span> Back
+    </button>
+    <script>
+        function goToHall() {
+            window.location.href = "{{ url_for('hall') }}";
+        }
+    </script>
 </body>
 </html>

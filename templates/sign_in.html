@@ -2,8 +2,30 @@
 <html lang="">
 
 <head>
-    <title>登录 - 小黄书</title>
+    <title>Log in - GameHub</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000000; /* Set the background color to black */
+        }
+        .card {
+            background-color: #000000; /* Set the card background color to black */
+            color: #FFD700; /* Set the text color to yellow (gold) */
+        }
+        .form-control {
+            background-color: #FFD700; /* Set the form control background color to yellow (gold) */
+            color: #000000; /* Set the form control text color to black */
+        }
+        .btn-primary {
+            background-color: #FFD700; /* Set the primary button background color to yellow (gold) */
+            color: #000000; /* Set the primary button text color to black */
+        }
+        /* Custom class to center-align the button horizontally */
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -12,17 +34,20 @@
             <div class="col-4">
                 <div class="card">
                     <div class="card-body">
-                        <h3 class="text-center">登录</h3>
+                        <h3 class="text-center">Log in</h3>
                         <form method="POST" action="{{ url_for('sign_in') }}">
                             <div class="form-group">
-                                <label for="username">用户名:</label>
+                                <label for="username">username:</label>
                                 <input type="text" class="form-control" id="username" name="username" required>
                             </div>
                             <div class="form-group">
-                                <label for="password">密码:</label>
+                                <label for="password">password:</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">登录</button>
+                            <!-- Add the button container with the centered button -->
+                            <div class="button-container">
+                                <button type="submit" class="btn btn-primary">Continue</button>
+                            </div>
                         </form>
                     </div>
                 </div>

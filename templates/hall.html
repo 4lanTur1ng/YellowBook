@@ -11,6 +11,8 @@
             justify-content: center;
             min-height: 100vh;
             text-align: center;
+            color: #FFD700; /* Set the text color to yellow (gold) */
+            background-color: #000000; /* Set the background color to black */
         }
         #postsList {
             max-width: 1600px;
@@ -20,22 +22,38 @@
             margin-top: 20px;
         }
         .post {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
+            background-color: #000000; /* Set the post background color to black */
+            border: 1px solid #FFD700; /* Set the post border color to yellow (gold) */
             border-radius: 5px;
             padding: 10px;
             margin-bottom: 10px;
             text-align: left;
+            color: #FFD700; /* Set the post text color to yellow (gold) */
+            width: 600px;
         }
         .post p {
             margin-bottom: 5px;
         }
         .post a {
-            color: #007bff;
-            text-decoration: none;
+            color: #FFD700; /* Set the link text color to yellow (gold) */
+            text-decoration: underline; /* Add underline to the link text */
         }
+        /* Modify buttons' styles */
+        .btn, .btn-primary {
+            background-color: #FFD700; /* Set the button background color to yellow (gold) */
+            color: #000000; /* Set the button text color to black */
+        }
+
+        /* Position the Back button in the top-left corner */
         #backButton {
-            margin-top: 20px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        /* Style the arrow symbol */
+        .arrow-symbol {
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -60,7 +78,9 @@
         </div>
     {% endfor %}
 
-    <button id="backButton" class="btn btn-primary" onclick="goBack()">Back</button>
+    <button id="backButton" class="btn btn-primary" onclick="goBack()">
+        <span class="arrow-symbol">&#8678;</span> Back
+    </button>
     <script>
         function goBack() {
             window.history.back();
