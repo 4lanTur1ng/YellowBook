@@ -3,7 +3,10 @@
 <head>
     <title>Hall</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+     <link href="https://fonts.googleapis.com/css2?family=Caveat&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
     <style>
+        /* 你的现有样式 */
         body {
             display: flex;
             flex-direction: column;
@@ -11,80 +14,158 @@
             justify-content: center;
             min-height: 100vh;
             text-align: center;
-            color: #FFD700; /* Set the text color to yellow (gold) */
-            background-color: #000000; /* Set the background color to black */
+            background-color: black;
+
+        }
+        h1 {
+            font-size: 96px;
+            font-family: 'Caveat', cursive;
+            color: white;
+        }
+        h2 {
+            font-family: 'Dancing Script' , cursive;
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
         }
         #postsList {
             max-width: 1600px;
-            margin-top: 20px;
+            margin-top: 10px;
+
+        }
+        .content-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        max-width: 1600px;
+        margin-top: 20px;
+        padding: 0 20px; /* 添加左右空白 */
+
+
+        /* 添加两条竖线 */
+            background: linear-gradient(to right, #ddd 2px, transparent 2px) 0 0 / 20px 100% no-repeat,
+            linear-gradient(to left, #ddd 2px, transparent 2px) 100% 0 / 20px 100% no-repeat;
+        }
+
+          .nav-btns {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+          .humorous-font {
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        font-size: 24px;
+        color: white;
+    }
+         .nav-btn {
+             padding: 10px 20px;
+            font-size: 16px;
+            background-color: black;
+            color: #FFFFFF;
+            border:none;
+            border-radius: 10px;
+            cursor: pointer;
+             margin-left: 10px;
+             margin-right: 10px;
+             border: 2px solid orange;
         }
         .partition {
-            margin-top: 20px;
+            margin-top: 0px;
         }
         .post {
-            background-color: #000000; /* Set the post background color to black */
-            border: 1px solid #FFD700; /* Set the post border color to yellow (gold) */
+            background-color: rgb(40,40,40);
+            border: 1px solid orange;
             border-radius: 5px;
-            padding: 10px;
+            padding:10px;
             margin-bottom: 10px;
             text-align: left;
-            color: #FFD700; /* Set the post text color to yellow (gold) */
-            width: 600px;
+            width: 720px
+
         }
         .post p {
             margin-bottom: 5px;
         }
         .post a {
-            color: #FFD700; /* Set the link text color to yellow (gold) */
-            text-decoration: underline; /* Add underline to the link text */
+            color: orange;
+            text-decoration: none;
         }
-        /* Modify buttons' styles */
-        .btn, .btn-primary {
-            background-color: #FFD700; /* Set the button background color to yellow (gold) */
-            color: #000000; /* Set the button text color to black */
-        }
-
-        /* Position the Back button in the top-left corner */
         #backButton {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-        }
-
-        /* Style the arrow symbol */
-        .arrow-symbol {
-            margin-right: 5px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Hall</h1>
-    <h2>Posts:</h2>
+    <h1 style="color:white">Hall</h1>
+    <h2 style="color:white">Posts:</h2>
+    <div class="nav-btns" style="background-color: black;border: 2px solid orange; border-radius: 0px;">
+        <button class="nav-btn" data-category="all">全部</button>
+        <button class="nav-btn" data-category="DS">{{label[0]}}</button>
+        <button class="nav-btn" data-category="SEKIRO">{{label[1]}}</button>
+        <button class="nav-btn" data-category="genshin-impact">{{label[2]}}</button>
+        <button class="nav-btn" data-category="MGS">{{label[3]}}</button>
+        <button class="nav-btn" data-category="MH">{{label[4]}}</button>
+        <button class="nav-btn" data-category="star-rail">{{label[5]}}</button>
+    </div>
+
+    <!-- 添加一个隐藏的input元素，用于存储当前选定的分区值 -->
+    <input type="hidden" id="selectedCategory" value="all">
+
     {% for partition, posts in grouped_posts.items() %}
         <div class="partition">
-            <h3>{{ partition }}</h3>
             <div id="postsList">
                 {% for post in posts %}
-                    <div class="post">
-                        <p><strong>{{ post['username'] }}</strong></p>
-                        <p>{{ post['post']['content'] }}</p>
+                    <!-- 使用条件判断来显示或隐藏post -->
+                    <div class="post" data-category="{{ post['post']['partition'] }}">
+                        <p class="humorous-font"><strong>{{ post['username'] }}</strong></p>
+                        <p style="color:white">{{ post['post']['content'] }}</p>
+                        <p style="color:white;font-weight: bold; border: 1px solid orange; padding: 1px;">分区:{{post['post']['partition']}}</p>
                         <a href="{{ url_for('post_details', post_id=post['post']['id']) }}">View Details</a>
                     </div>
                 {% endfor %}
                 {% if not posts %}
-                    <p class="text-center">No posts available.</p>
                 {% endif %}
             </div>
         </div>
     {% endfor %}
 
-    <button id="backButton" class="btn btn-primary" onclick="goBack()">
-        <span class="arrow-symbol">&#8678;</span> Back
-    </button>
+    <button id="backButton" class="nav-btn" onclick="goBack()">返回</button>
+
     <script>
         function goBack() {
             window.history.back();
         }
+
+        // 添加点击事件监听器，用于处理分区按钮的点击
+        document.addEventListener("DOMContentLoaded", function () {
+            const btns = document.querySelectorAll(".nav-btn");
+            const posts = document.querySelectorAll(".post");
+
+            btns.forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    const category = btn.getAttribute("data-category");
+                    document.getElementById("selectedCategory").value = category;
+
+                    // 隐藏所有post
+                    posts.forEach(function (post) {
+                        post.style.display = "none";
+                    });
+
+                    // 显示符合条件的post
+                    if (category === "all") {
+                        posts.forEach(function (post) {
+                            post.style.display = "block";
+                        });
+                    } else {
+                        const selectedPosts = document.querySelectorAll(
+                            `.post[data-category="${category}"]`
+                        );
+                        selectedPosts.forEach(function (post) {
+                            post.style.display = "block";
+                        });
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

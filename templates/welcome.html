@@ -8,11 +8,11 @@
             display: flex;
             flex-direction: row;
             background-color: #000000; /* Set the background color to black */
-            color: #FFD700; /* Set the text color to yellow (gold) */
+            color: orange; /* Set the text color to yellow (gold) */
         }
         #sidebar .btn,
         .btn-primary {
-            background-color: #FFD700; /* Set the button background color to yellow (gold) */
+            background-color: orange; /* Set the button background color to yellow (gold) */
             color: #000000; /* Set the button text color to black */
         }
         #sidebar {
@@ -28,7 +28,7 @@
         #postsList .btn {
             margin-bottom: 10px;
             width: 100%;
-            background-color: #FFD700; /* Set the button background color to yellow (gold) */
+            background-color: orange; /* Set the button background color to yellow (gold) */
             color: #000000; /* Set the button text color to black */
         }
         #postDetail {
@@ -65,7 +65,7 @@
             cursor: pointer;
             margin-left: 10px;
             padding: 0;
-            color: #FFD700; /* Set the delete button text color to yellow (gold) */
+            color: orange; /* Set the delete button text color to yellow (gold) */
         }
         .delete-icon {
             width: 20px;
@@ -94,6 +94,7 @@
             {% endif %}
         </div>
         <a href="{{ url_for('user_details', username=username) }}" class="btn btn-primary btn-block mt-3">User Details</a>
+        <button class="btn btn-danger btn-block" id="logoutButton" onclick="logout()">注销</button>
     </div>
     <div id="main">
         <div id="postDetail">
@@ -102,7 +103,9 @@
         <form id="createPostForm" action="{{ url_for('create_post') }}" method="post" style="display: none;">
             <textarea id="postContent" name="post_content" class="form-control mb-3" placeholder="Write a new post..."></textarea>
             <button type="submit" id="postButton" class="btn btn-primary btn-block">Post</button>
+
         </form>
+
     </div>
     <script>
         function showCreatePostForm() {
@@ -141,6 +144,21 @@
                 error: function(xhr, status, error) {
                     alert('An error occurred while deleting the post.');
                 }
+            });
+        }
+
+        function logout() {
+            $.ajax({
+            url: '/logout',
+            type: 'GET',
+            success: function(response) {
+            // 清除浏览器历史记录
+            window.location.replace('/sign_in');
+
+            },
+            error: function(xhr, status, error) {
+            alert('An error occurred while logging out.');
+            }
             });
         }
     </script>
